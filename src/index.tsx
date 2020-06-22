@@ -4,6 +4,7 @@ import { App } from './App';
 import { Auth0Provider } from './react-auth0-spa';
 import * as serviceWorker from './serviceWorker';
 import { mergeStyles } from 'office-ui-fabric-react';
+import { initializeIcons } from '@uifabric/icons';
 
 // Inject some global styles
 mergeStyles({
@@ -15,6 +16,8 @@ mergeStyles({
         },
     },
 });
+
+initializeIcons();
 
 ReactDOM.render(
     <Auth0Provider>

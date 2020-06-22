@@ -25,7 +25,7 @@ export const Login: React.FunctionComponent = () => {
         >
             <Image src={logo} alt='Maintenance App Logo' />
             <Text variant='mega'>Maintenance App</Text>
-            <PrimaryButton text='Login' onClick={() => loginWithRedirect({})} />
+            <PrimaryButton iconProps={{ iconName: 'Signin' }} text='Login' onClick={() => loginWithRedirect({})} />
         </Stack>
     );
 };

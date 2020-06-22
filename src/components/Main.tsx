@@ -1,35 +1,16 @@
 import React from 'react';
-import { Stack, List, FontWeights, DefaultButton, Text, IStackTokens } from 'office-ui-fabric-react';
+import { Stack, DefaultButton, Text, Image, IStackTokens, PrimaryButton } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
-import axios from 'axios';
-
-const boldStyle = {
-    root: { fontWeight: FontWeights.semibold },
-};
+import { Table } from '.';
+import logo from '../images/logo.png';
 
 const sectionStackTokens: IStackTokens = { childrenGap: 10 };
 
 export const Main: React.FunctionComponent = () => {
     const { logout } = useAuth0();
-    const [items, setItems] = React.useState();
 
-    React.useEffect(() => {
-        axios
-            .get('items')
-            .then((response) => {
-                setItems(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
-
-    const onRenderCell = (item: any, index: number | undefined): JSX.Element => {
-        return (
-            <Text styles={boldStyle} variant='large'>
-                {item.name}
-            </Text>
-        );
+    const addNewItem = () => {
+        console.log('ADD');
     };
 
     return (
@@ -47,8 +28,15 @@ export const Main: React.FunctionComponent = () => {
             }}
             tokens={sectionStackTokens}
         >
-            <List items={items} onRenderCell={onRenderCell} />
-            <DefaultButton text='Log out' onClick={() => logout()} />
+            <Stack horizontalAlign='center' verticalAlign='center' horizontal tokens={sectionStackTokens}>
+                <Image width={32} height={32} src={logo} alt='Logo' />
+                <Text variant='xxLarge'>Maintenance App</Text>
+            </Stack>
+            <Stack horizontalAlign='space-between' verticalAlign='center' horizontal tokens={sectionStackTokens}>
+                <PrimaryButton iconProps={{ iconName: 'Add' }} text='Add New' onClick={() => addNewItem()} />
+                <DefaultButton iconProps={{ iconName: 'SignOut' }} text='Log out' onClick={() => logout()} />
+            </Stack>
+            <Table />
         </Stack>
     );
 };
