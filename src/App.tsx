@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth0 } from './react-auth0-spa';
 import { Main, Login } from './components';
 import { Spinner, Stack } from 'office-ui-fabric-react';
+import { RecoilRoot } from 'recoil';
 
 axios.defaults.baseURL = 'https://maintenance-e737.restdb.io/rest/';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('id_token');
@@ -16,7 +17,7 @@ export const App: React.FunctionComponent = () => {
     }
 
     return (
-        <>
+        <RecoilRoot>
             {isLoading ? (
                 <Stack
                     horizontalAlign='center'
@@ -40,6 +41,6 @@ export const App: React.FunctionComponent = () => {
             ) : (
                 <Login />
             )}
-        </>
+        </RecoilRoot>
     );
 };

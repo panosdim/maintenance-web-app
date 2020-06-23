@@ -7,21 +7,16 @@ import {
     DefaultButton,
     Slider,
     TextField,
+    DatePicker,
+    mergeStyleSets,
+    DayOfWeek,
 } from 'office-ui-fabric-react';
-import { ItemType } from '.';
+import { ItemType, isHidden, selectedItem, format } from '.';
+import { useRecoilState } from 'recoil';
 
-interface IProps {
-    hidden: boolean;
-    item: ItemType | null;
-    onVisibleChange: (visible: boolean) => void;
-}
-export const DialogForm: React.FunctionComponent<IProps> = (props: IProps) => {
-    const { hidden, item, onVisibleChange } = props;
-    const [isHidden, setHidden] = React.useState(hidden);
-
-    React.useEffect(() => {
-        setHidden(hidden);
-    }, [hidden]);
+export const DialogForm: React.FunctionComponent = () => {
+    const [hidden, setHidden] = useRecoilState(isHidden);
+    const [item, setItem] = useRecoilState<ItemType | undefined>(selectedItem);
 
     const modelProps = {
         isBlocking: true,
@@ -34,17 +29,24 @@ export const DialogForm: React.FunctionComponent<IProps> = (props: IProps) => {
 
     const handleCancel = () => {
         setHidden(true);
-        onVisibleChange(true);
+        setItem(undefined);
     };
 
     const handleOk = () => {
         setHidden(true);
-        onVisibleChange(true);
+        setItem(undefined);
     };
+
+    const controlClass = mergeStyleSets({
+        control: {
+            margin: '0 0 15px 0',
+            maxWidth: '300px',
+        },
+    });
 
     return (
         <Dialog
-            hidden={isHidden}
+            hidden={hidden}
             onDismiss={handleCancel}
             dialogContentProps={dialogContentProps}
             modalProps={modelProps}
@@ -58,6 +60,14 @@ export const DialogForm: React.FunctionComponent<IProps> = (props: IProps) => {
                 defaultValue={item?.periodicity}
                 showValue
                 snapToStep
+            />
+            <DatePicker
+                className={controlClass.control}
+                firstDayOfWeek={DayOfWeek.Monday}
+                label='Last Maintenance'
+                isRequired={true}
+                value={item ? new Date(item.last_maintenance) : new Date()}
+                formatDate={format}
             />
             <DialogFooter>
                 <PrimaryButton onClick={handleOk} text='Save' />

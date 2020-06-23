@@ -11,7 +11,8 @@ import {
 } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
 import axios from 'axios';
-import { truncateDay, format, ItemType, DialogForm } from '.';
+import { truncateDay, format, ItemType, DialogForm, isHidden, selectedItem } from '.';
+import { useSetRecoilState } from 'recoil';
 
 const boldStyle = {
     root: { fontWeight: FontWeights.semibold },
@@ -21,8 +22,8 @@ export const Table: React.FunctionComponent = () => {
     const { isAuthenticated } = useAuth0();
     const [items, setItems] = React.useState<ItemType[]>([]);
     const [isLoading, setLoading] = React.useState(true);
-    const [isDialogHidden, setDialogHidden] = React.useState(true);
-    const [item, setItem] = React.useState<ItemType | null>(null);
+    const setHidden = useSetRecoilState(isHidden);
+    const setItem = useSetRecoilState<ItemType | undefined>(selectedItem);
 
     React.useEffect(() => {
         if (isAuthenticated) {
@@ -36,7 +37,7 @@ export const Table: React.FunctionComponent = () => {
                     console.log(error);
                 });
         }
-    }, [isAuthenticated, isDialogHidden]);
+    }, [isAuthenticated]);
 
     const _columns = [
         { key: 'name', name: 'Item', fieldName: 'name', minWidth: 400, maxWidth: 400, isResizable: false },
@@ -97,19 +98,14 @@ export const Table: React.FunctionComponent = () => {
         }
     };
 
-    const selection = (item?: any, _index?: number, _ev?: React.FocusEvent<HTMLElement>) => {
+    const selection = (item?: ItemType, _index?: number, _ev?: React.FocusEvent<HTMLElement>) => {
         setItem(item);
-        setDialogHidden(false);
+        setHidden(false);
     };
 
-    const invoked = (item?: any, _index?: number, _ev?: Event) => {
+    const invoked = (item?: ItemType, _index?: number, _ev?: Event) => {
         setItem(item);
-        setDialogHidden(false);
-    };
-
-    const onVisibleChange = (visible: boolean) => {
-        setDialogHidden(visible);
-        setItem(null);
+        setHidden(false);
     };
 
     return (
@@ -127,7 +123,7 @@ export const Table: React.FunctionComponent = () => {
                 selectionPreservedOnEmptyClick={false}
                 onItemInvoked={invoked}
             />
-            <DialogForm hidden={isDialogHidden} onVisibleChange={onVisibleChange} item={item} />
+            <DialogForm />
         </>
     );
 };

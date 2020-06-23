@@ -1,16 +1,20 @@
 import React from 'react';
 import { Stack, DefaultButton, Text, Image, IStackTokens, PrimaryButton } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
-import { Table } from '.';
+import { Table, isHidden, selectedItem } from '.';
 import logo from '../images/logo.png';
+import { useSetRecoilState } from 'recoil';
 
 const sectionStackTokens: IStackTokens = { childrenGap: 10 };
 
 export const Main: React.FunctionComponent = () => {
     const { logout } = useAuth0();
+    const setHidden = useSetRecoilState(isHidden);
+    const setItem = useSetRecoilState(selectedItem);
 
     const addNewItem = () => {
-        console.log('ADD');
+        setHidden(false);
+        setItem(undefined);
     };
 
     return (
