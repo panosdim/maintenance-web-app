@@ -4,27 +4,25 @@ import {
     FontWeights,
     IColumn,
     mergeStyles,
-    DetailsList,
     SelectionMode,
     DetailsListLayoutMode,
     CheckboxVisibility,
+    ShimmeredDetailsList,
 } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
 import axios from 'axios';
-import { truncateDay, format } from '.';
+import { truncateDay, format, ItemType, DialogForm } from '.';
 
 const boldStyle = {
     root: { fontWeight: FontWeights.semibold },
 };
 
-type ItemsType = {
-    name: string;
-    periodicity: number;
-    last_maintenance: Date;
-};
 export const Table: React.FunctionComponent = () => {
     const { isAuthenticated } = useAuth0();
-    const [items, setItems] = React.useState<ItemsType[]>([]);
+    const [items, setItems] = React.useState<ItemType[]>([]);
+    const [isLoading, setLoading] = React.useState(true);
+    const [isDialogHidden, setDialogHidden] = React.useState(true);
+    const [item, setItem] = React.useState<ItemType | null>(null);
 
     React.useEffect(() => {
         if (isAuthenticated) {
@@ -32,12 +30,13 @@ export const Table: React.FunctionComponent = () => {
                 .get('items')
                 .then((response) => {
                     setItems(response.data);
+                    setLoading(false);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, isDialogHidden]);
 
     const _columns = [
         { key: 'name', name: 'Item', fieldName: 'name', minWidth: 400, maxWidth: 400, isResizable: false },
@@ -53,14 +52,14 @@ export const Table: React.FunctionComponent = () => {
             key: 'last_maintenance',
             name: 'Last Maintenance',
             fieldName: 'last_maintenance',
-            minWidth: 200,
-            maxWidth: 200,
+            minWidth: 150,
+            maxWidth: 150,
             isResizable: false,
         },
     ];
 
-    const _renderItemColumn = (item: ItemsType, index?: number, column?: IColumn) => {
-        const fieldContent = item[column!.fieldName as keyof ItemsType] as string;
+    const _renderItemColumn = (item: ItemType, _index?: number, column?: IColumn) => {
+        const fieldContent = item[column!.fieldName as keyof ItemType] as string;
 
         switch (column!.key) {
             case 'name':
@@ -98,22 +97,37 @@ export const Table: React.FunctionComponent = () => {
         }
     };
 
-    const selection = (item?: any, index?: number, ev?: React.FocusEvent<HTMLElement>) => {
-        console.log(item);
+    const selection = (item?: any, _index?: number, _ev?: React.FocusEvent<HTMLElement>) => {
+        setItem(item);
+        setDialogHidden(false);
+    };
+
+    const invoked = (item?: any, _index?: number, _ev?: Event) => {
+        setItem(item);
+        setDialogHidden(false);
+    };
+
+    const onVisibleChange = (visible: boolean) => {
+        setDialogHidden(visible);
+        setItem(null);
     };
 
     return (
-        <DetailsList
-            selectionMode={SelectionMode.single}
-            onRenderItemColumn={_renderItemColumn}
-            columns={_columns}
-            setKey='none'
-            checkboxVisibility={CheckboxVisibility.hidden}
-            layoutMode={DetailsListLayoutMode.justified}
-            items={items}
-            onActiveItemChanged={selection}
-            selectionPreservedOnEmptyClick={false}
-            enterModalSelectionOnTouch={true}
-        />
+        <>
+            <ShimmeredDetailsList
+                selectionMode={SelectionMode.none}
+                onRenderItemColumn={_renderItemColumn}
+                columns={_columns}
+                setKey='name'
+                checkboxVisibility={CheckboxVisibility.hidden}
+                layoutMode={DetailsListLayoutMode.justified}
+                items={items}
+                enableShimmer={isLoading}
+                onActiveItemChanged={selection}
+                selectionPreservedOnEmptyClick={false}
+                onItemInvoked={invoked}
+            />
+            <DialogForm hidden={isDialogHidden} onVisibleChange={onVisibleChange} item={item} />
+        </>
     );
 };
