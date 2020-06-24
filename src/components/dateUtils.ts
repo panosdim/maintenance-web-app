@@ -1,16 +1,11 @@
 export const format = (date?: Date): string => {
-    const [yyyy, mm, dd] = date!.toISOString().split(/[^\d]/);
-    return `${dd}-${mm}-${yyyy}`;
+    return date!.getDate() + '-' + (date!.getMonth() + 1) + '-' + date!.getFullYear();
 };
 
 export const ymd = (t: Date = new Date()): string => {
-    return t.toISOString().slice(0, 10)
+    return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate();
 }
 
 export const truncateDay = (t = new Date()) => {
     return new Date(ymd(t))
 }
-
-export const getYear = (date: string): number => {
-    return Number(date.split('-')[0]);
-};

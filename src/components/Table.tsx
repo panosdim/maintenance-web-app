@@ -11,8 +11,8 @@ import {
 } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
 import axios from 'axios';
-import { truncateDay, format, ItemType, DialogForm, isHidden, selectedItem } from '.';
-import { useSetRecoilState } from 'recoil';
+import { truncateDay, format, ItemType, DialogForm, isHidden, selectedItem, itemsDB } from '.';
+import { useSetRecoilState, useRecoilState } from 'recoil';
 
 const boldStyle = {
     root: { fontWeight: FontWeights.semibold },
@@ -20,7 +20,7 @@ const boldStyle = {
 
 export const Table: React.FunctionComponent = () => {
     const { isAuthenticated } = useAuth0();
-    const [items, setItems] = React.useState<ItemType[]>([]);
+    const [items, setItems] = useRecoilState(itemsDB);
     const [isLoading, setLoading] = React.useState(true);
     const setHidden = useSetRecoilState(isHidden);
     const setItem = useSetRecoilState<ItemType | undefined>(selectedItem);
@@ -37,7 +37,7 @@ export const Table: React.FunctionComponent = () => {
                     console.log(error);
                 });
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, setItems]);
 
     const _columns = [
         { key: 'name', name: 'Item', fieldName: 'name', minWidth: 400, maxWidth: 400, isResizable: false },
