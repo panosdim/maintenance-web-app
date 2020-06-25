@@ -8,6 +8,7 @@ import {
     DetailsListLayoutMode,
     CheckboxVisibility,
     ShimmeredDetailsList,
+    MessageBar,
 } from 'office-ui-fabric-react';
 import { useAuth0 } from '../react-auth0-spa';
 import axios from 'axios';
@@ -24,6 +25,9 @@ export const Table: React.FunctionComponent = () => {
     const [isLoading, setLoading] = React.useState(true);
     const setHidden = useSetRecoilState(isHidden);
     const setItem = useSetRecoilState<ItemType | undefined>(selectedItem);
+    const [message, setMessage] = React.useState('');
+    const [showMessage, setMessageShow] = React.useState(false);
+    const [hintShown, setHintShown] = React.useState(false);
 
     React.useEffect(() => {
         if (isAuthenticated) {
@@ -47,6 +51,7 @@ export const Table: React.FunctionComponent = () => {
             fieldName: 'periodicity',
             minWidth: 100,
             maxWidth: 100,
+            data: 'number',
             isResizable: false,
         },
         {
@@ -98,9 +103,15 @@ export const Table: React.FunctionComponent = () => {
         }
     };
 
-    const selection = (item?: ItemType, _index?: number, _ev?: React.FocusEvent<HTMLElement>) => {
-        setItem(item);
-        setHidden(false);
+    const showHint = () => {
+        if (!hintShown) {
+            setMessageShow(true);
+            setMessage('Double click on a row to edit an item');
+            setTimeout(() => {
+                setMessageShow(false);
+            }, 3000);
+            setHintShown(true);
+        }
     };
 
     const invoked = (item?: ItemType, _index?: number, _ev?: Event) => {
@@ -110,19 +121,20 @@ export const Table: React.FunctionComponent = () => {
 
     return (
         <>
-            <ShimmeredDetailsList
-                selectionMode={SelectionMode.none}
-                onRenderItemColumn={_renderItemColumn}
-                columns={_columns}
-                setKey='name'
-                checkboxVisibility={CheckboxVisibility.hidden}
-                layoutMode={DetailsListLayoutMode.justified}
-                items={items}
-                enableShimmer={isLoading}
-                onActiveItemChanged={selection}
-                selectionPreservedOnEmptyClick={false}
-                onItemInvoked={invoked}
-            />
+            <div onMouseEnter={showHint}>
+                <ShimmeredDetailsList
+                    selectionMode={SelectionMode.none}
+                    onRenderItemColumn={_renderItemColumn}
+                    columns={_columns}
+                    setKey='name'
+                    checkboxVisibility={CheckboxVisibility.hidden}
+                    layoutMode={DetailsListLayoutMode.justified}
+                    items={items}
+                    enableShimmer={isLoading}
+                    onItemInvoked={invoked}
+                />
+            </div>
+            {showMessage && <MessageBar className={mergeStyles({ width: '350px' })}>{message}</MessageBar>}
             <DialogForm />
         </>
     );
