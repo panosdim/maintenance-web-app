@@ -13,6 +13,7 @@ export const App: React.FunctionComponent = () => {
     if (isAuthenticated) {
         getIdTokenClaims().then((resp: { __raw: any }) => {
             localStorage.setItem('id_token', resp.__raw);
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + resp.__raw;
         });
     }
 
